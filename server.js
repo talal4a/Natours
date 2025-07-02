@@ -8,7 +8,7 @@ process.on("uncaughtException", (err) => {
 });
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
-  decodeURIComponent(process.env.DATABASE_PASSWORD)
+  process.env.DATABASE_PASSWORD // Already encoded in config.env
 );
 mongoose
   .connect(DB, {
@@ -24,13 +24,14 @@ mongoose
   });
 const app = require("./app");
 const port = 3000;
-app.listen(port, () => {
-  console.log(`Server is running on port on ${port}`);
+const server = app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
 process.on("unhandledRejection", (err) => {
   console.log(`UNHANDLED REJECTION! 💥 Shutting down .... `);
   console.log(err.name, err.message);
   server.close(() => {
+    // server is not defined
     process.exit(1);
   });
 });

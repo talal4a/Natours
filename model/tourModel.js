@@ -89,12 +89,12 @@ tourSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
-tourSchema.pre("/^find/", function (next) {
+tourSchema.pre(/^find/, function (next) { // CORRECT REGEX
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
   next();
 });
-tourSchema.post("/^find/", function (docs, next) {
+tourSchema.post(/^find/, function (docs, next) { // CORRECT REGEX
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
   next();
 });

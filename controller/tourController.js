@@ -49,7 +49,7 @@ exports.updateTour = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
- res.status(200).json({
+  res.status(200).json({
     status: "success",
     data: {
       tour,
@@ -143,3 +143,4 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
   });
 });
+

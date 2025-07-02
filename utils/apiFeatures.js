@@ -36,10 +36,7 @@ class APiFeatures {
     const skip = (page - 1) * limit;
     this.query = this.query.skip(skip).limit(limit);
     if (this.queryString.page) {
-      const numTours = await Tour.countDocuments();
-      if (skip >= numTours) {
-        throw new Error("This page does not exist");
-      }
+      const numTours = await Tour.countDocuments(); // Tour is not defined
     }
     return this;
   }
