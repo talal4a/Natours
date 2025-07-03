@@ -10,16 +10,19 @@ const signToken = (id) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
-exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body);
-  const token = signToken(newUser._id);
-  res.status(201).json({
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
     status: "sucess",
     token,
     data: {
-      user: newUser,
+      user: user,
     },
   });
+};
+exports.signup = catchAsync(async (req, res, next) => {
+  const newUser = await User.create(req.body);
+  createSendToken(newUser, 201, res);
 });
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
@@ -32,11 +35,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
-  const token = signToken(user._id);
-  res.status(201).json({
-    status: "sucess",
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -56,7 +55,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   const freshUser = await User.findById(decode.id);
   if (!freshUser) {
     return next(
-      new AppError("The user belong to this token not longer exist", 401)
+      new AppError("The user belonging to this token no longer exists.", 401)
     );
   }
   if (freshUser.changedPasswordAfter(decode.iat)) {
@@ -93,10 +92,7 @@ exports.forgotPassword = async (req, res, next) => {
       subject: "Your password reset token (valid for 10 min)",
       message,
     });
-    res.status(200).json({
-      status: "success",
-      message: "Token sent to email!",
-    });
+    createSendToken(user, 200, res);
   } catch (err) {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
@@ -123,8 +119,14 @@ exports.resetPassword = async (req, res, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
   const token = signToken(user._id);
-  res.status(200).json({
-    status: 200,
-    token,
-  });
+  createSendToken(user, 200, res);
+};
+exports.updatePassword = async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+  if (!user.correctPassword(req.body.passwordCurrent, user.password)) {
+    return next(new AppError("Your current password is wrong", 401));
+  }
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save();
 };
