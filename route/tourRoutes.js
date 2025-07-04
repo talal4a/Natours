@@ -1,4 +1,5 @@
 const express = require("express");
+
 const router = express.Router();
 const tourController = require("../controller/tourController");
 const authController = require("../controller/authController");
@@ -19,6 +20,6 @@ router
   .delete(
     authController.protect,
     authController.restrictTo("admin", "lead-guide"),
-    tourController.deleteTour
+    tourController.deleteTour,
   );
 module.exports = router;

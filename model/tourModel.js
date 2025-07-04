@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
 const validator = require("validator");
+// const User = require("./userModal");
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -47,10 +48,12 @@ const tourSchema = new mongoose.Schema(
     priceDiscount: {
       type: Number,
       default: 0,
-      validate: function (val) {
-        return val < this.price;
+      validate: {
+        validator: function (val) {
+          return val < this.price;
+        },
+        message: "Discount price ({VALUE}) should be below regular price",
       },
-      message: `Discount price ({VALUE}) should be below regular price`,
     },
     summary: {
       type: String,
@@ -76,6 +79,30 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
   },
   {
     toJSON: { virtuals: true },
@@ -89,13 +116,30 @@ tourSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
-tourSchema.pre(/^find/, function (next) { // CORRECT REGEX
+
+// tourSchema.pre("save", async function (next) {
+//   if (!this.guides || this.guides.length === 0) return next();
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
+
+tourSchema.pre(/^find/, function (next) {
+  // CORRECT REGEX
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
   next();
 });
-tourSchema.post(/^find/, function (docs, next) { // CORRECT REGEX
+tourSchema.post(/^find/, function (docs, next) {
+  // CORRECT REGEX
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+  next();
+});
+tourSchema.pre(/^find/, async function (next) {
+  const tour = await Tour.findById(req.params.id).populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
   next();
 });
 tourSchema.pre("aggregate", function (next) {

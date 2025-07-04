@@ -1,19 +1,58 @@
 const express = require("express");
-const app = express();
-const globalErrorHandler = require("./controller/errorController.js");
-const AppError = require("./utils/appError");
 const morgan = require("morgan");
-app.use(express.json());
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
+const hpp = require("hpp");
+const reviewRouter = require("./route/reviewRoute");
+const AppError = require("./utils/appError");
+const globalErrorHandler = require("./controller/errorController");
+const app = express();
+// 1) Set security HTTP headers
+app.use(helmet());
+// 2) Development logging
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+// 3) Limit requests from same API
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "Too many requests from this IP, please try again in an hour!",
+});
+app.use("/api", limiter);
+// 4) Body parser, reading data from body into req.body
+app.use(express.json({ limit: "10kb" }));
+// 5) Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+// 6) Data sanitization against XSS
+app.use(xss());
+// 7) Prevent parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      "duration",
+      "ratingsQuantity",
+      "ratingsAverage",
+      "maxGroupSize",
+      "difficulty",
+      "price",
+    ],
+  })
+);
+// 8) Serving static files
 app.use(express.static(`${__dirname}/public`));
+// 9) Routes
 const toursRouter = require("./route/tourRoutes");
 const usersRouter = require("./route/userRoutes");
 app.use("/api/v1/tours", toursRouter);
 app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/reviews", reviewRouter);
+// 10) Handling unhandled routes
 app.all("*", (req, res, next) => {
-next(new AppError(`Can't find the ${req.originalUrl} on this server!`, 404));
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
+// 11) Global error handling middleware
 app.use(globalErrorHandler);
 module.exports = app;

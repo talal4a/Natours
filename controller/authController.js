@@ -1,22 +1,34 @@
 const { promisify } = require("util");
 const crypto = require("crypto");
+
 const jwt = require("jsonwebtoken");
+
 const User = require("../model/userModal");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+
+const signToken = (id) =>
+  jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
+const cookieOptions = {
+  expires: new Date(
+    Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000,
+  ),
+  secure: true,
+  httpOnly: true,
 };
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
+  if (process.env.NOD_ENV === "production")
+    res.cookie("jwt", token, cookieOptions);
+  user.password = undefined;
   res.status(statusCode).json({
     status: "sucess",
     token,
     data: {
-      user: user,
+      user,
     },
   });
 };
@@ -30,7 +42,7 @@ exports.login = catchAsync(async (req, res, next) => {
     next(new AppError("Please provide email and password !", 400));
   }
   const user = await User.findOne({
-    email: email,
+    email,
   }).select("+password");
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
@@ -48,35 +60,38 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   if (!token) {
     return next(
-      new AppError("You are not logged in! Please log into to get  acess", 401)
+      new AppError("You are not logged in! Please log into to get  acess", 401),
     );
   }
   const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   const freshUser = await User.findById(decode.id);
   if (!freshUser) {
     return next(
-      new AppError("The user belonging to this token no longer exists.", 401)
+      new AppError("The user belonging to this token no longer exists.", 401),
     );
   }
   if (freshUser.changedPasswordAfter(decode.iat)) {
     return next(
-      new AppError("User recently changed the password!Please login again", 401)
+      new AppError(
+        "User recently changed the password!Please login again",
+        401,
+      ),
     );
   }
   req.user = freshUser;
   next();
 });
-exports.restrictTo = (...roles) => {
-  return (req, res, next) => {
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError("You donot have premission to perform this action "),
-        403
+        403,
       );
     }
     next();
   };
-};
 exports.forgotPassword = async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -123,10 +138,22 @@ exports.resetPassword = async (req, res, next) => {
 };
 exports.updatePassword = async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password");
-  if (!user.correctPassword(req.body.passwordCurrent, user.password)) {
+  const isCorrect = await user.correctPassword(
+    req.body.passwordCurrent,
+    user.password,
+  );
+  if (!isCorrect) {
     return next(new AppError("Your current password is wrong", 401));
   }
   user.password = req.body.password;
   user.confirmPassword = req.body.confirmPassword;
   await user.save();
+  const token = signToken(user._id);
+  res.status(200).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
 };

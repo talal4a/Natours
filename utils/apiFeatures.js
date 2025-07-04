@@ -3,6 +3,7 @@ class APiFeatures {
     this.query = query;
     this.queryString = queryString;
   }
+
   filter() {
     const queryObj = { ...this.queryString };
     const excludedFields = ["page", "sort", "limit", "fields"];
@@ -12,6 +13,7 @@ class APiFeatures {
     this.query = this.query.find(JSON.parse(queryStr));
     return this;
   }
+
   sort() {
     if (this.queryString.sort) {
       const sortBy = this.queryString.sort.split(",").join(" ");
@@ -21,6 +23,7 @@ class APiFeatures {
     }
     return this;
   }
+
   limitsFields() {
     if (this.queryString.fields) {
       const fields = this.queryString.fields.split(",").join(" ");
@@ -30,13 +33,14 @@ class APiFeatures {
     }
     return this;
   }
+
   async paginate() {
     const page = this.queryString.page * 1 || 1;
     const limit = this.queryString.limit * 1 || 100;
     const skip = (page - 1) * limit;
     this.query = this.query.skip(skip).limit(limit);
     if (this.queryString.page) {
-      const numTours = await Tour.countDocuments(); // Tour is not defined
+      const numTours = await Tour.countDocuments();
     }
     return this;
   }

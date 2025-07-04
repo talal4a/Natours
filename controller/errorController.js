@@ -17,12 +17,10 @@ const handleValidationErrorDB = (err) => {
   const message = `Invalid input data. ${errors.join(". ")}`;
   return new AppError(message, 400);
 };
-const handleJWTError = (err) => {
-  return new AppError("Invalid token.Please enter valid token");
-};
-const handleJWTExpiredError = (err) => {
-  return new AppError("You have  expired.Please login again", 401);
-};
+const handleJWTError = (err) =>
+  new AppError("Invalid token.Please enter valid token");
+const handleJWTExpiredError = (err) =>
+  new AppError("You have  expired.Please login again", 401);
 const sendErrorDev = (res, err) => {
   res.status(err.statusCode).json({
     status: err.status,
