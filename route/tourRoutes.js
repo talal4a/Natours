@@ -23,7 +23,7 @@ router
     tourController.deleteTour
   );
 router
-  .route("/:tourId/review")
+  .route("/:tourId/reviews")
   .post(
     authController.protect,
     authController.restrictTo("user"),

@@ -49,6 +49,7 @@ const usersRouter = require("./route/userRoutes");
 app.use("/api/v1/tours", toursRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/reviews", reviewRouter);
+
 // 10) Handling unhandled routes
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
