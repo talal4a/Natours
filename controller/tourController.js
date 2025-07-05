@@ -20,7 +20,6 @@ exports.getAllTours = factory.getAll(Tour);
 exports.getTour = factory.getOne(Tour, { path: "reviews" });
 exports.deleteTour = factory.deleteOne(Tour);
 exports.updateTour = factory.updateOne(Tour);
-exports.createReview = factory.createOne(Tour);
 exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
@@ -89,3 +88,6 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
   });
 });
+exports.createTour = factory.createOne(Tour);
+// Add a console.log to check if factory.createOne is returning a function
+console.log('createTour type:', typeof factory.createOne(Tour));

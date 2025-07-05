@@ -12,7 +12,7 @@ router
     reviewController.createReview
   );
 router
-  .route(":/id")
+  .route("/:id")
   .get(reviewController.getReview)
   .patch(
     authController.restrictTo("user", "admin"),
