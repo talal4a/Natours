@@ -29,7 +29,19 @@ const reviews = JSON.parse(
 const importData = async () => {
   try {
     await Tour.create(tours);
-    await User.create(users);
+    
+    // Add confirmPassword to each user
+    const usersWithConfirmPassword = users.map(user => {
+      // Create a new object with all existing properties
+      const newUser = {...user};
+      // Add confirmPassword equal to password
+      newUser.confirmPassword = user.password;
+      return newUser;
+    });
+    
+    // Use the modified users array
+    await User.create(usersWithConfirmPassword, { validateBeforeSave: false });
+    
     await Reviews.create(reviews);
     console.log('Data successfully loaded!');
   } catch (err) {
@@ -40,6 +52,8 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany();
+    await User.deleteMany();
+    await Reviews.deleteMany();
     console.log('Data successfully deleted!');
   } catch (err) {
     console.error('Error deleting data:', err);
