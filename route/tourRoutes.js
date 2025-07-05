@@ -26,7 +26,7 @@ router
   .route("/:tourId/review")
   .post(
     authController.protect,
-    authController.restrictTo("users"),
+    authController.restrictTo("user"),
     reviewController.createReview
   );
 module.exports = router;
