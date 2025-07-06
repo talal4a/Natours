@@ -89,5 +89,6 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   });
 });
 exports.createTour = factory.createOne(Tour);
-// Add a console.log to check if factory.createOne is returning a function
-console.log('createTour type:', typeof factory.createOne(Tour));
+exports.getToursWithin = (req, res, next) => {
+  const { distance, center, unit } = req.params;
+};
