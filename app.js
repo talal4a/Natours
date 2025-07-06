@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
@@ -9,6 +10,9 @@ const reviewRouter = require("./route/reviewRoute");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controller/errorController");
 const app = express();
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
 // 1) Set security HTTP headers
 app.use(helmet());
 // 2) Development logging
@@ -42,10 +46,13 @@ app.use(
   })
 );
 // 8) Serving static files
-app.use(express.static(`${__dirname}/public`));
+
 // 9) Routes
 const toursRouter = require("./route/tourRoutes");
 const usersRouter = require("./route/userRoutes");
+app.get("/", (req, res) => {
+  res.status(200).render("base");
+});
 app.use("/api/v1/tours", toursRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/reviews", reviewRouter);
