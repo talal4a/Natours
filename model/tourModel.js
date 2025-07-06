@@ -124,7 +124,7 @@ tourSchema.pre("save", function (next) {
 });
 tourSchema.index({ price: 1, ratingAverage: -1 });
 tourSchema.index({ slug: 1 });
-
+tourSchema.index({ startLocation: "2dsphere" });
 tourSchema.pre(/^find/, function (next) {
   // CORRECT REGEX
   this.find({ secretTour: { $ne: true } });
