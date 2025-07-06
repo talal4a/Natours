@@ -37,5 +37,10 @@ reviewSchema.pre(/^find/, function (next) {
   });
   next();
 });
+reviewSchema.statics.calAverageRatings = function (tour) {
+  this.aggregate([
+    
+  ]);
+};
 const Review = mongoose.model("Review", reviewSchema);
 module.exports = Review;

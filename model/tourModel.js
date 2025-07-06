@@ -121,13 +121,8 @@ tourSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
-
-// tourSchema.pre("save", async function (next) {
-//   if (!this.guides || this.guides.length === 0) return next();
-//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
-//   this.guides = await Promise.all(guidesPromises);
-//   next();
-// });
+tourSchema.index({ price: 1, ratingAverage: -1 });
+tourSchema.index({ slug: 1 });
 
 tourSchema.pre(/^find/, function (next) {
   // CORRECT REGEX
@@ -155,3 +150,9 @@ tourSchema.pre("aggregate", function (next) {
 });
 const Tour = mongoose.model("Tour", tourSchema);
 module.exports = Tour;
+// tourSchema.pre("save", async function (next) {
+//   if (!this.guides || this.guides.length === 0) return next();
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
