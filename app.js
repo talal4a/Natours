@@ -66,6 +66,16 @@ app.get("/", (req, res) => {
     user: "Talal",
   });
 });
+app.get("/overview", (req, res) => {
+  res.status(200).render("overview", {
+    title: "All tours",
+  });
+});
+app.get("/tours", (req, res) => {
+  res.status(200).render("tour", {
+    title: "The Forest Hiker Tour",
+  });
+});
 app.use("/api/v1/tours", toursRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/reviews", reviewRouter);
