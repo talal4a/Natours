@@ -12,9 +12,19 @@ const globalErrorHandler = require("./controller/errorController");
 const app = express();
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
-// 1) Set security HTTP headers
-app.use(helmet());
+
+// Change this line
+// First serve static files
+app.use(express.static(path.join(__dirname, "starter/public")));
+
+// Then apply Helmet (this order matters)
+// Try this more permissive configuration
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // Disable CSP entirely for testing
+  })
+);
+
 // 2) Development logging
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -51,7 +61,10 @@ app.use(
 const toursRouter = require("./route/tourRoutes");
 const usersRouter = require("./route/userRoutes");
 app.get("/", (req, res) => {
-  res.status(200).render("base");
+  res.status(200).render("base", {
+    tour: "The Forest hiker",
+    user: "Talal",
+  });
 });
 app.use("/api/v1/tours", toursRouter);
 app.use("/api/v1/users", usersRouter);
