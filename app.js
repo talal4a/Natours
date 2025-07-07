@@ -10,7 +10,7 @@ const reviewRouter = require("./route/reviewRoute");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controller/errorController");
 const app = express();
-const viewRouter = require("./route/viewsRoute");
+const viewRouter = require("./route/viewRoute");
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "views"));
 
