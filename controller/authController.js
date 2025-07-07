@@ -1,20 +1,17 @@
 const { promisify } = require("util");
 const crypto = require("crypto");
-
 const jwt = require("jsonwebtoken");
-
 const User = require("../model/userModal");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
-
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 const cookieOptions = {
   expires: new Date(
-    Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000,
+    Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
   ),
   secure: true,
   httpOnly: true,
@@ -57,25 +54,24 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(" ")[1];
     console.log("Extracted token:", token);
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token) {
     return next(
-      new AppError("You are not logged in! Please log into to get  acess", 401),
+      new AppError("You are not logged in! Please log into to get  acess", 401)
     );
   }
   const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   const freshUser = await User.findById(decode.id);
   if (!freshUser) {
     return next(
-      new AppError("The user belonging to this token no longer exists.", 401),
+      new AppError("The user belonging to this token no longer exists.", 401)
     );
   }
   if (freshUser.changedPasswordAfter(decode.iat)) {
     return next(
-      new AppError(
-        "User recently changed the password!Please login again",
-        401,
-      ),
+      new AppError("User recently changed the password!Please login again", 401)
     );
   }
   req.user = freshUser;
@@ -87,7 +83,7 @@ exports.restrictTo =
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError("You donot have premission to perform this action "),
-        403,
+        403
       );
     }
     next();
@@ -140,7 +136,7 @@ exports.updatePassword = async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password");
   const isCorrect = await user.correctPassword(
     req.body.passwordCurrent,
-    user.password,
+    user.password
   );
   if (!isCorrect) {
     return next(new AppError("Your current password is wrong", 401));
