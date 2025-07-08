@@ -34,7 +34,7 @@ block content
           //- form.form.form-user-data(action='/submit-user-data' method='POST' enctype='multipart/form-data')
           
           //- WITH API
-          form.form.form-user-data(action='/submit-user-data', method='POST')
+          form.form.form-user-data(enctype='multipart/form-data')
             .form__group
               label.form__label(for='name') Name
               input#name.form__input(type='text', value=`${user.name}`, required, name='name')
@@ -42,7 +42,10 @@ block content
               label.form__label(for='email') Email address
               input#email.form__input(type='email', value=`${user.email}`, required, name='email')
             .form__group.form__photo-upload
-              img.form__user-photo(src=`/img/users/${user.photo}`, alt='User photo')
+              if user.photo
+                img.form__user-photo(src=`/img/users/${user.photo}`, alt='User photo')
+              else
+                img.form__user-photo(src='/img/users/default.jpg', alt='User photo')
               input.form__upload(type='file', accept='image/*', id='photo', name='photo')
               label(for='photo') Choose new photo
               
