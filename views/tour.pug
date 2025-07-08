@@ -10,8 +10,20 @@ mixin overviewBox(label, text, icon)
     span.overview-box__text= text
 
 block append head
-  link(rel='stylesheet', href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css')
+  link(rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css')
   script(src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js')
+  script(src='/js/mapbox.js')
+  style.
+    #map { 
+      height: 60vh;
+      width: 100%;
+      margin: 2rem 0;
+      z-index: 0;
+    }
+    .map-container {
+      position: relative;
+      width: 100%;
+    }
 
 block content
   section.section-header
@@ -21,12 +33,12 @@ block content
 
     .heading-box
       h1.heading-primary
-        span= tour.name + ' tour'
+        span= `${tour.name} tour`
       .heading-box__group
         .heading-box__detail
           svg.heading-box__icon
             use(xlink:href='/img/icons.svg#icon-clock')
-          span.heading-box__text= tour.duration + ' days'
+          span.heading-box__text= `${tour.duration} days`
         .heading-box__detail
           svg.heading-box__icon
             use(xlink:href='/img/icons.svg#icon-map-pin')
@@ -37,29 +49,29 @@ block content
       div
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Quick facts
-
           - const date = new Date(tour.startDates[0]).toLocaleString('en-us', { month: 'long', year: 'numeric' });
           +overviewBox('Next date', date, 'calendar')
           +overviewBox('Difficulty', tour.difficulty, 'trending-up')
-          +overviewBox('Participants', tour.maxGroupSize + ' people', 'user')
-          +overviewBox('Rating', tour.ratingsAverage + ' / 5', 'star')
+          +overviewBox('Participants', `${tour.maxGroupSize} people`, 'user')
+          +overviewBox('Rating', `${tour.ratingsAverage} / 5`, 'star')
 
         .overview-box__group
           h2.heading-secondary.ma-bt-lg Your tour guides
-
           each guide in tour.guides
             .overview-box__detail
-              img.overview-box__img(src=`/img/users/${guide.photo}`, alt=guide.name)
-
+              img.overview-box__img(
+                src=`/img/users/${guide.photo}`, 
+                alt=guide.name,
+                onerror="this.src='/img/users/default.jpg'"
+              )
               - if (guide.role === 'lead-guide')
                 span.overview-box__label Lead guide
               - else if (guide.role === 'guide')
                 span.overview-box__label Tour guide
-
               span.overview-box__text= guide.name
 
     .description-box
-      h2.heading-secondary.ma-bt-lg= 'About ' + tour.name + ' tour'
+      h2.heading-secondary.ma-bt-lg= `About ${tour.name} tour`
       - const paragraphs = tour.description.split('\n');
       each p in paragraphs
         p.description__text= p
@@ -69,12 +81,14 @@ block content
       .picture-box
         img.picture-box__img(
           src=`/img/tours/${img}`,
-          alt=tour.name + ' ' + (i + 1),
-          class=`picture-box__img--${i + 1}`
+          alt=`${tour.name} ${i + 1}`,
+          class=`picture-box__img--${i + 1}`,
+          onerror="this.src='/img/tours/tour-1-cover.jpg'"
         )
 
   section.section-map
-    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+    .map-container
+      #map(data-locations=JSON.stringify(tour.locations))
 
   section.section-reviews
     .reviews
@@ -85,19 +99,46 @@ block content
     .cta
       .cta__img.cta__img--logo
         img(src='/img/logo-white.png', alt='Natours logo')
-      img.cta__img.cta__img--1(src=`/img/tours/${tour.images[1]}`, alt='Tour picture')
-      img.cta__img.cta__img--2(src=`/img/tours/${tour.images[2]}`, alt='Tour picture')
+      img.cta__img.cta__img--1(
+        src=`/img/tours/${tour.images[1]}`,
+        alt='Tour picture',
+        onerror="this.src='/img/tours/tour-1-cover.jpg'"
+      )
+      img.cta__img.cta__img--2(
+        src=`/img/tours/${tour.images[2]}`,
+        alt='Tour picture',
+        onerror="this.src='/img/tours/tour-1-cover.jpg'"
+      )
       .cta__content
         h2.heading-secondary What are you waiting for?
-        p.cta__text= tour.duration + ' days. 1 adventure. Infinite memories. Make it yours today!'
-
+        p.cta__text= `${tour.duration} days. 1 adventure. Infinite memories. Make it yours today!`
         if user
           button.btn.btn--green.span-all-rows#book-tour(data-tour-id=`${tour.id}`) Book tour now!
         else
           a.btn.btn--green.span-all-rows(href='/login') Log in to book tour
 
 block append scripts
-  script(src='/js/mapbox.js')
   script.
-    const locations = !{JSON.stringify(tour.locations)};
-    displayMap(locations);
+    (function() {
+      function initMap() {
+        const mapElement = document.getElementById('map');
+        if (mapElement) {
+          try {
+            const locationsData = mapElement.dataset.locations;
+            if (!locationsData) return;
+            const locations = JSON.parse(locationsData);
+            if (Array.isArray(locations) && locations.length > 0) {
+              displayMap(locations);
+            }
+          } catch (err) {
+            console.error('Error parsing map locations:', err);
+          }
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initMap);
+      } else {
+        // DOMContentLoaded already fired
+        initMap();
+      }
+    })();

@@ -1323,3 +1323,228 @@ body {
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
 }
+
+/* ============================================
+   MAP STYLES
+   ============================================ */
+.map-container {
+  position: relative;
+  width: 100%;
+  margin: 2rem 0;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.1);
+}
+
+#map {
+  height: 60vh;
+  width: 100%;
+  z-index: 0;
+  background-color: #f7f7f7;
+}
+
+/* Custom marker styles */
+.marker {
+  position: relative;
+  width: 30px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.marker-pin {
+  width: 30px;
+  height: 30px;
+  border-radius: 50% 50% 50% 0;
+  background: #55c57a;
+  position: absolute;
+  transform: rotate(-45deg);
+  left: 0;
+  top: 0;
+  margin: -15px 0 0 -15px;
+  animation: bounce 1s;
+  animation-fill-mode: both;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.marker-pin::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  margin: 8px 0 0 8px;
+  background: #fff;
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* Popup styles */
+.leaflet-popup {
+  margin-bottom: 12px !important;
+}
+
+.leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 5px;
+  box-shadow: 0 1px 7px rgba(0, 0, 0, 0.2);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  padding: 1rem;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.leaflet-popup-content p {
+  margin: 0;
+}
+
+.leaflet-popup-tip-container {
+  width: 30px;
+  height: 15px;
+  position: absolute;
+  left: 50%;
+  margin-left: -15px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.leaflet-popup-tip {
+  width: 17px;
+  height: 17px;
+  padding: 1px;
+  margin: -10px auto 0;
+  background: #fff;
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Map controls */
+.leaflet-control-zoom {
+  border: none !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 4px !important;
+  overflow: hidden;
+}
+
+.leaflet-bar {
+  border: none !important;
+}
+
+.leaflet-bar a {
+  width: 30px !important;
+  height: 30px !important;
+  line-height: 30px !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  color: #555 !important;
+  background: #fff !important;
+  transition: all 0.2s;
+}
+
+.leaflet-bar a:hover {
+  background: #f8f8f8 !important;
+  color: #333 !important;
+}
+
+.leaflet-bar a:first-child {
+  border-top-left-radius: 4px !important;
+  border-top-right-radius: 4px !important;
+}
+
+.leaflet-bar a:last-child {
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+  border-bottom: none !important;
+}
+
+/* Map error state */
+.map-error {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f8f8;
+  color: #777;
+  font-size: 1.6rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Animation for marker bounce */
+@keyframes bounce {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) rotate(-45deg);
+  }
+  80% {
+    transform: translateY(5px) rotate(-45deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(-45deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 56.25em) {
+  #map {
+    height: 50vh;
+  }
+}
+
+@media (max-width: 37.5em) {
+  #map {
+    height: 45vh;
+  }
+  
+  .leaflet-popup-content {
+    font-size: 1.2rem;
+    padding: 0.8rem;
+  }
+}
+
+/* Ensure map is properly sized when in a hidden container (like tabs) */
+.leaflet-container.leaflet-touch {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.leaflet-container {
+  font-family: 'Lato', sans-serif;
+  line-height: 1.5;
+  color: #333;
+}
+
+/* Fix for map tiles not loading properly */
+.leaflet-tile {
+  filter: inherit !important;
+  -webkit-filter: none !important;
+}
+
+/* Fix for map controls in dark mode */
+@media (prefers-color-scheme: dark) {
+  .leaflet-bar a {
+    background: #2d3439 !important;
+    color: #e0e0e0 !important;
+    border-bottom-color: #3d444c !important;
+  }
+  
+  .leaflet-bar a:hover {
+    background: #3d444c !important;
+    color: #fff !important;
+  }
+  
+  .leaflet-popup-content-wrapper {
+    background: #2d3439;
+    color: #e0e0e0;
+  }
+  
+  .leaflet-popup-tip {
+    background: #2d3439;
+  }
+}
