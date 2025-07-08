@@ -1,6 +1,7 @@
 /* eslint-disable */
 import axios from 'axios';
 import { showAlert } from './alerts';
+// LOGIN FUNCTION
 export const login = async (email, password) => {
   try {
     const res = await axios({
@@ -11,7 +12,6 @@ export const login = async (email, password) => {
         password,
       },
     });
-
     if (res.data.status === 'success') {
       showAlert('success', 'Logged in successfully!');
       window.setTimeout(() => {
@@ -19,19 +19,22 @@ export const login = async (email, password) => {
       }, 1500);
     }
   } catch (err) {
-    showAlert('error', err.response.data.message);
+    showAlert('error', err.response?.data?.message || 'Login failed');
   }
 };
-
+// LOGOUT FUNCTION
 export const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
       url: 'http://127.0.0.1:3000/api/v1/users/logout',
     });
-    if ((res.data.status = 'success')) location.reload(true);
+    if (res.data.status === 'success') {
+      // Reload the page from the server (not cache)
+      window.location.reload(true);
+    }
   } catch (err) {
-    console.log(err.response);
+    console.error(err.response);
     showAlert('error', 'Error logging out! Try again.');
   }
 };
