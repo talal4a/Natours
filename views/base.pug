@@ -7,14 +7,15 @@ html
     link(rel="shortcut icon" type="image/png" href="/img/favicon.png")
     link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,700")
     title Natours | #{title}
+
+    // ✅ Add Axios globally (newer version)
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+
     block head
 
   body
     include _header
-    
     block content
-    
     include _footer
 
     block scripts
-     script(src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js')

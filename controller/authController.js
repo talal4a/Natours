@@ -20,12 +20,12 @@ const signToken = (id) =>
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
+  const cookieExpiresDays = Number(process.env.JWT_COOKIES_EXPIRES_IN) || 90;
+
   const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
+    expires: new Date(Date.now() + cookieExpiresDays * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // true in production only
+    secure: process.env.NODE_ENV === "production",
   };
 
   res.cookie("jwt", token, cookieOptions); // ✅ Always set cookie
@@ -241,8 +241,18 @@ exports.isLoggedIn = catchAsync(async (req, res, next) => {
       res.locals.user = currentUser;
       req.user = currentUser;
     } catch (err) {
-      return next(); 
+      return next();
     }
   }
   next();
 });
+// ===================
+//      LOGOUT
+// ===================
+exports.logout = (req, res) => {
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: "success" });
+};
