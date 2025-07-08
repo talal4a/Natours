@@ -1,24 +1,25 @@
-const fs = require("fs");
-const Tour = require("../model/tourModel");
-const catchAsync = require("../utils/catchAsync");
-const factory = require("./handlerFactory");
-const AppError = require("../utils/appError");
+const fs = require('fs');
+const Tour = require('../model/tourModel');
+const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
+const AppError = require('../utils/appError');
+
 exports.checkID = (req, res, next, val) => {
   const id = req.params.id * 1;
   res.status(404).json({
-    status: "fail",
-    message: "Invalid ID",
+    status: 'fail',
+    message: 'Invalid ID',
   });
   next();
 };
 exports.aliasToptours = (req, res, next) => {
-  req.query.limit = "5";
-  req.query.sort = "-ratingAverage,price";
-  req.query.fields = "name,price,ratingAverage,summary,difficulty";
+  req.query.limit = '5';
+  req.query.sort = '-ratingAverage,price';
+  req.query.fields = 'name,price,ratingAverage,summary,difficulty';
   next();
 };
 exports.getAllTours = factory.getAll(Tour);
-exports.getTour = factory.getOne(Tour, { path: "reviews" });
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 exports.deleteTour = factory.deleteOne(Tour);
 exports.updateTour = factory.updateOne(Tour);
 exports.getTourStats = catchAsync(async (req, res, next) => {
@@ -28,13 +29,13 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
     },
     {
       $group: {
-        _id: { $toUpper: "$difficulty" },
+        _id: { $toUpper: '$difficulty' },
         numTours: { $sum: 1 },
-        numRatings: { $sum: "$ratingsQuantity" },
-        avgRating: { $avg: "$ratingAverage" },
-        avgPrice: { $avg: "$price" },
-        minPrice: { $min: "$price" },
-        maxPrice: { $max: "$price" },
+        numRatings: { $sum: '$ratingsQuantity' },
+        avgRating: { $avg: '$ratingAverage' },
+        avgPrice: { $avg: '$price' },
+        minPrice: { $min: '$price' },
+        maxPrice: { $max: '$price' },
       },
     },
     {
@@ -42,7 +43,7 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
     },
   ]);
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       stats,
     },
@@ -52,7 +53,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   const year = req.params.year * 1;
   const plan = await Tour.aggregate([
     {
-      $unwind: "$startDates",
+      $unwind: '$startDates',
     },
     {
       $match: {
@@ -64,13 +65,13 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
     {
       $group: {
-        _id: { $month: "$startDates" },
+        _id: { $month: '$startDates' },
         numTourStarts: { $sum: 1 },
-        tours: { $push: "$name" },
+        tours: { $push: '$name' },
       },
     },
     {
-      $addFields: { month: "$_id" },
+      $addFields: { month: '$_id' },
     },
     {
       $project: { _id: 0 },
@@ -83,7 +84,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
   ]);
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       plan,
     },
@@ -92,16 +93,16 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 exports.createTour = factory.createOne(Tour);
 exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
-  const [lat, lng] = latlng.split(",");
+  const [lat, lng] = latlng.split(',');
   if (!lat || !lng) {
     return next(
       new AppError(
-        "Please provide latitude and longitude in the format lat,lng.",
+        'Please provide latitude and longitude in the format lat,lng.',
         400
       )
     );
   }
-  const radius = unit === "mi" ? distance / 3963.2 : distance / 6378.1;
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
   const tours = await Tour.find({
     startLocation: {
       $geoWithin: {
@@ -110,32 +111,32 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
     },
   });
   res.status(200).json({
-    status: "success",
+    status: 'success',
     results: tours.length,
     data: { tours },
   });
 });
 exports.getDistances = catchAsync(async (req, res, next) => {
   const { latlng, unit } = req.params;
-  const [lat, lng] = latlng.split(",");
+  const [lat, lng] = latlng.split(',');
 
   if (!lat || !lng) {
     return next(
       new AppError(
-        "Please provide latitude and longitude in the format lat,lng.",
+        'Please provide latitude and longitude in the format lat,lng.',
         400
       )
     );
   }
-  const multiplier = unit === "mi" ? 0.000621371 : 0.001;
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
   const distances = await Tour.aggregate([
     {
       $geoNear: {
         near: {
-          type: "Point",
+          type: 'Point',
           coordinates: [parseFloat(lng), parseFloat(lat)],
         },
-        distanceField: "distance",
+        distanceField: 'distance',
         distanceMultiplier: multiplier,
       },
     },
@@ -147,7 +148,7 @@ exports.getDistances = catchAsync(async (req, res, next) => {
     },
   ]);
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       distances,
     },

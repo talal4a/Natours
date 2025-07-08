@@ -8,9 +8,7 @@ html
     link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,700")
     title Natours | #{title}
 
-    // ✅ Add Axios globally (newer version)
-    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
-
+    
     block head
 
   body
@@ -19,3 +17,6 @@ html
     include _footer
 
     block scripts
+    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+    script(src='/js/login.js')
+    script(src='/js/settings.js')

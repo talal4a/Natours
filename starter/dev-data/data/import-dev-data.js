@@ -1,10 +1,12 @@
 const fs = require('fs');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+
 dotenv.config({ path: './config.env' });
 const Tour = require('../../../model/tourModel');
-const User = require('../../../model/userModal');
-const Reviews = require('../../../model/reviewModal');
+const User = require('../../../model/userModel');
+const Reviews = require('../../../model/reviewModel');
+
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD
@@ -29,19 +31,19 @@ const reviews = JSON.parse(
 const importData = async () => {
   try {
     await Tour.create(tours);
-    
+
     // Add confirmPassword to each user
-    const usersWithConfirmPassword = users.map(user => {
+    const usersWithConfirmPassword = users.map((user) => {
       // Create a new object with all existing properties
-      const newUser = {...user};
+      const newUser = { ...user };
       // Add confirmPassword equal to password
       newUser.confirmPassword = user.password;
       return newUser;
     });
-    
+
     // Use the modified users array
     await User.create(usersWithConfirmPassword, { validateBeforeSave: false });
-    
+
     await Reviews.create(reviews);
     console.log('Data successfully loaded!');
   } catch (err) {

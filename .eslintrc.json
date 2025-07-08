@@ -26,11 +26,5 @@
     "func-names": "off",
     "no-return-await": "off",
     "radix": "off"
-  },
-  "semi": true,
-  "singleQuote": true,
-  "trailingComma": "es5",
-  "bracketSpacing": true,
-  "arrowParens": "avoid",
-  "endOfLine": "auto"
+  }
 }

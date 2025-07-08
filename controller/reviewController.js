@@ -1,5 +1,6 @@
-const Review = require("../model/reviewModal");
-const factory = require("./handlerFactory");
+const Review = require('../model/reviewModel');
+const factory = require('./handlerFactory');
+
 exports.getAllReviews = factory.getAll(Review);
 exports.setTourUserIds = (req, res, next) => {
   if (!req.body.tour) req.body.tour = req.params.tourId;
@@ -8,6 +9,5 @@ exports.setTourUserIds = (req, res, next) => {
 };
 exports.getReview = factory.getOne(Review);
 exports.createReview = factory.createOne(Review);
-console.log('createReview type:', typeof factory.createOne(Review));
 exports.deleteReview = factory.deleteOne(Review);
 exports.updateReview = factory.updateOne(Review);

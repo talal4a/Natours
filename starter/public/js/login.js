@@ -1,11 +1,23 @@
-/* eslint-disable */
-import { showAlert } from './alerts.js'; // This is fine if alerts.js is also a module
+// ✅ ALERT FUNCTION
+const showAlert = (type, msg) => {
+  const el = document.querySelector('.alert');
+  if (el) el.remove();
 
-export const login = async (email, password) => {
+  const markup = `<div class="alert alert--${type}">${msg}</div>`;
+  document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
+
+  setTimeout(() => {
+    const alert = document.querySelector('.alert');
+    if (alert) alert.remove();
+  }, 3000);
+};
+
+// ✅ LOGIN FUNCTION
+const login = async (email, password) => {
   try {
-    const res = await window.axios({
+    const res = await axios({
       method: 'POST',
-      url: 'http://127.0.0.1:3000/api/v1/users/login',
+      url: 'http://127.0.0.1:8000/api/v1/users/login',
       data: { email, password },
       withCredentials: true,
     });
@@ -19,12 +31,12 @@ export const login = async (email, password) => {
   }
 };
 
-// Logout
-export const logout = async () => {
+// ✅ LOGOUT FUNCTION
+const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: 'http://127.0.0.1:3000/api/v1/users/logout',
+      url: 'http://127.0.0.1:8000/api/v1/users/logout',
       withCredentials: true,
     });
 
@@ -32,18 +44,27 @@ export const logout = async () => {
       window.location.reload(true);
     }
   } catch (err) {
-    console.error(err.response);
     showAlert('error', 'Error logging out! Try again.');
   }
 };
 
-// Add login form listener
+// ✅ EVENT LISTENERS
 const loginForm = document.querySelector('.form--login');
+const logoutBtn = document.querySelector('.nav__el--logout');
+
 if (loginForm) {
   loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     login(email, password);
+  });
+}
+
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    console.log('Logout button clicked');
+    logout();
   });
 }
