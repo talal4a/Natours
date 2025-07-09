@@ -1,0 +1,56 @@
+extends base
+
+block content
+  main.main
+    .signup-form
+      h2.heading-secondary.ma-bt-lg Create your account
+      form.form.form--signup
+        .form__group
+          label.form__label(for='name') Full Name
+          input#name.form__input(
+            type='text',
+            placeholder='John Doe',
+            required,
+            minlength='3',
+            autocomplete='name'
+          )
+        .form__group
+          label.form__label(for='email') Email address
+          input#email.form__input(
+            type='email',
+            placeholder='you@example.com',
+            required,
+            autocomplete='email'
+          )
+        .form__group.ma-bt-md
+          label.form__label(for='password') Password
+          input#password.form__input(
+            type='password',
+            placeholder='••••••••',
+            required,
+            minlength='8',
+            autocomplete='new-password'
+          )
+        .form__group.ma-bt-md
+          label.form__label(for='passwordConfirm') Confirm Password
+          input#passwordConfirm.form__input(
+            type='password',
+            placeholder='••••••••',
+            required,
+            minlength='8',
+            autocomplete='new-password'
+          )
+        .form__group
+          button.btn.btn--green(type='submit') Sign up
+        .form__group
+          p.form__text
+            | Already have an account? 
+            a(href='/login') Log in
+
+block append scripts
+  script(src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js')
+  script.
+    // Make axios available globally
+    window.axios = axios;
+  script(src='/js/alerts.js')
+  script(src='/js/signup.js')

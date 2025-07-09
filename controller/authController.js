@@ -28,7 +28,7 @@ const createSendToken = (user, statusCode, res) => {
     secure: process.env.NODE_ENV === 'production',
   };
 
-  res.cookie('jwt', token, cookieOptions); // ✅ Always set cookie
+  res.cookie('jwt', token, cookieOptions); // Always set cookie
 
   user.password = undefined;
 
@@ -45,7 +45,21 @@ const createSendToken = (user, statusCode, res) => {
 //        SIGNUP
 // =======================
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body);
+  // 1) Extract only the needed fields from the request body
+  const { name, email, password, passwordConfirm } = req.body;
+  
+  // 2) Create the user with the extracted fields
+  const newUser = await User.create({
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    password,
+    passwordConfirm
+  });
+
+  // 3) Remove the password from the output
+  newUser.password = undefined;
+  
+  // 4) Generate JWT and send response
   createSendToken(newUser, 201, res);
 });
 

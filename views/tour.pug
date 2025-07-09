@@ -119,26 +119,91 @@ block content
 
 block append scripts
   script.
-    (function() {
-      function initMap() {
-        const mapElement = document.getElementById('map');
-        if (mapElement) {
-          try {
-            const locationsData = mapElement.dataset.locations;
-            if (!locationsData) return;
-            const locations = JSON.parse(locationsData);
-            if (Array.isArray(locations) && locations.length > 0) {
-              displayMap(locations);
-            }
-          } catch (err) {
-            console.error('Error parsing map locations:', err);
-          }
+    // Wait for everything to be fully loaded
+    window.addEventListener('load', function() {
+      console.log('Page fully loaded, initializing map...');
+      
+      const mapElement = document.getElementById('map');
+      if (!mapElement) {
+        console.error('Map container not found');
+        return;
+      }
+      
+      try {
+        const locationsData = mapElement.dataset.locations;
+        if (!locationsData) {
+          console.error('No locations data found');
+          return;
         }
+        
+        const locations = JSON.parse(locationsData);
+        if (!Array.isArray(locations) || locations.length === 0) {
+          console.error('No valid locations data');
+          return;
+        }
+        
+        console.log('Initializing map with locations:', locations);
+        
+        // Initialize map with explicit options
+        const map = L.map('map', {
+          center: [locations[0].coordinates[1], locations[0].coordinates[0]],
+          zoom: 10,
+          zoomControl: true,
+          scrollWheelZoom: false,
+          renderer: L.canvas(), // Force canvas renderer for better performance
+          preferCanvas: true
+        });
+        
+        // Add OpenStreetMap tile layer with retry options
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxZoom: 19,
+          minZoom: 2,
+          noWrap: true,
+          reuseTiles: true,
+          updateWhenIdle: true
+        }).addTo(map);
+        
+        // Add markers
+        const markers = [];
+        locations.forEach(loc => {
+          if (loc.coordinates && loc.coordinates.length === 2) {
+            const marker = L.marker([loc.coordinates[1], loc.coordinates[0]])
+              .addTo(map)
+              .bindPopup(`<p>Day ${loc.day}: ${loc.description}</p>`);
+            markers.push(marker);
+          }
+        });
+        
+        // Fit bounds with padding
+        if (markers.length > 0) {
+          const group = new L.featureGroup(markers);
+          map.fitBounds(group.getBounds().pad(0.2));
+        }
+        
+        // Fix for tile loading issues
+        setTimeout(() => {
+          map.invalidateSize();
+          // Force a re-render of all tiles
+          map.eachLayer(layer => {
+            if (layer instanceof L.TileLayer) {
+              layer.redraw();
+            }
+          });
+        }, 100);
+        
+        // Handle window resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            map.invalidateSize();
+          }, 100);
+        });
+        
+        console.log('Map initialized successfully');
+        
+      } catch (error) {
+        console.error('Error initializing map:', error);
       }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initMap);
-      } else {
-        // DOMContentLoaded already fired
-        initMap();
-      }
-    })();
+    });

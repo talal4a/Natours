@@ -20,12 +20,15 @@ const reviewRouter = require('./route/reviewRoute');
 const app = express();
 
 // CORS configuration
-app.use(
-  cors({
-    origin: 'http://127.0.0.1:8000',
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: ['http://localhost:8000', 'http://127.0.0.1:8000', 'http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Set-Cookie'],
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
 // Set pug engine
 app.set('view engine', 'pug');
@@ -100,6 +103,9 @@ app.use(
     ],
   })
 );
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
 
 // 3) ROUTES
 app.use('/', viewRouter);

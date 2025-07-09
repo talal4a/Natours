@@ -18,6 +18,11 @@ html
     include _footer
 
     block scripts
-    script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
-    script(src='/js/login.js')
-    script(src='/js/updateSettings.js')
+      script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+      script.
+        // Make axios available globally
+        window.axios = axios;
+      script(src='/js/alerts.js')
+      script(src='/js/login.js')
+      script(src='/js/updateSettings.js')
+      script(src='/js/updatePassword.js' type='module')

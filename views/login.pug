@@ -4,7 +4,7 @@ block content
   main.main
     .login-form
       h2.heading-secondary.ma-bt-lg Log into your account
-      form.form.form--login(id='loginForm')
+      form.form.form--login
         .form__group
           label.form__label(for='email') Email address
           input#email.form__input(
@@ -24,6 +24,15 @@ block content
           )
         .form__group
           button.btn.btn--green(type='submit') Login
+        .form__group
+          p.form__text
+            | Don't have an account? 
+            a(href='/signup') Sign up
 
-block scripts
-
+block append scripts
+  script(src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js')
+  script.
+    // Make axios available globally
+    window.axios = axios;
+  script(src='/js/alerts.js')
+  script(src='/js/login.js')
