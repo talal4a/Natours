@@ -2,27 +2,26 @@ doctype html
 html
   head
     meta(charset="UTF-8")
-    meta(name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
-    link(rel="stylesheet" href="/css/style.css")
-    link(rel="shortcut icon" type="image/png" href="/img/favicon.png")
-    link(rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,700")
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet' href='/css/style.css')
+    link(rel='shortcut icon' type='image/png' href='/img/favicon.png')
+    link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
     title Natours | #{title}
 
-    
     block head
 
   body
+    // HEADER
     include _header
+
+    // CONTENT
     main.main
       block content
+
+    // FOOTER
     include _footer
 
+    // ✅ Custom scripts block
     block scripts
       script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
-      script.
-        // Make axios available globally
-        window.axios = axios;
-      script(src='/js/alerts.js')
-      script(src='/js/login.js')
-      script(src='/js/updateSettings.js')
-      script(src='/js/updatePassword.js' type='module')
+      script(src="/js/login.js")

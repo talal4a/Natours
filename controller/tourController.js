@@ -95,12 +95,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
   if (!lat || !lng) {
-    return next(
-      new AppError(
-        'Please provide latitude and longitude in the format lat,lng.',
-        400
-      )
-    );
+    return next(new AppError('Please provide latitude and longitude in the format lat,lng.', 400));
   }
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
   const tours = await Tour.find({
@@ -121,12 +116,7 @@ exports.getDistances = catchAsync(async (req, res, next) => {
   const [lat, lng] = latlng.split(',');
 
   if (!lat || !lng) {
-    return next(
-      new AppError(
-        'Please provide latitude and longitude in the format lat,lng.',
-        400
-      )
-    );
+    return next(new AppError('Please provide latitude and longitude in the format lat,lng.', 400));
   }
   const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
   const distances = await Tour.aggregate([

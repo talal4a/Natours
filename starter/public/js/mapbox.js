@@ -21,9 +21,10 @@ const displayMap = (locations) => {
 
     // Add OpenStreetMap tile layer with proper attribution
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 19,
-      detectRetina: true
+      detectRetina: true,
     }).addTo(map);
 
     // Create an array to store the bounds
@@ -35,14 +36,14 @@ const displayMap = (locations) => {
       try {
         // Ensure coordinates are in the correct format [lat, lng]
         const coords = [loc.coordinates[1], loc.coordinates[0]];
-        
+
         // Create custom icon
         const customIcon = L.divIcon({
           className: 'marker',
           html: '<div class="marker-pin"></div>',
           iconSize: [30, 42],
           iconAnchor: [15, 42],
-          popupAnchor: [0, -45]
+          popupAnchor: [0, -45],
         });
 
         // Create marker with custom icon
@@ -55,7 +56,7 @@ const displayMap = (locations) => {
             {
               className: 'custom-popup',
               closeButton: true,
-              offset: [0, -20]
+              offset: [0, -20],
             }
           );
 
@@ -72,7 +73,7 @@ const displayMap = (locations) => {
       map.fitBounds(bounds, {
         padding: [50, 50],
         maxZoom: 12,
-        animate: true
+        animate: true,
       });
     } else {
       // Set default view if no valid locations
@@ -80,16 +81,20 @@ const displayMap = (locations) => {
     }
 
     // Add zoom control
-    L.control.zoom({
-      position: 'topright'
-    }).addTo(map);
+    L.control
+      .zoom({
+        position: 'topright',
+      })
+      .addTo(map);
 
     // Add scale control
-    L.control.scale({
-      imperial: false,
-      metric: true,
-      position: 'bottomright'
-    }).addTo(map);
+    L.control
+      .scale({
+        imperial: false,
+        metric: true,
+        position: 'bottomright',
+      })
+      .addTo(map);
 
     // Handle window resize
     let resizeTimer;
@@ -102,7 +107,6 @@ const displayMap = (locations) => {
         }
       }, 250);
     });
-
   } catch (error) {
     console.error('Error initializing map:', error);
     const mapElement = document.getElementById('map');

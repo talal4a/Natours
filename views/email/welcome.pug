@@ -1,0 +1,24 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    title= `${subject}`
+    style
+      | body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+      | .header { text-align: center; margin-bottom: 30px; }
+      | .logo { max-width: 200px; margin-bottom: 20px; }
+      | .button { display: inline-block; padding: 12px 24px; background-color: #55c57a; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+      | .footer { margin-top: 30px; font-size: 12px; text-align: center; color: #777; }
+  body
+    .header
+      img.logo(src='https://natours.dev/img/logo-green.png' alt='Natours logo')
+      h1 Welcome to Natours, #{firstName}!
+    p We're excited to have you on board. Get ready to explore the best tours with us!
+    p To get started, please verify your email address by clicking the button below:
+    p(style='text-align: center;')
+      a.button(href=`${url}`) Verify Email
+    p If you didn't create an account, please ignore this email or contact support if you have any questions.
+    .footer
+      p © #{new Date().getFullYear()} Natours. All rights reserved.
+      p This email was sent to #{to} as part of your Natours account.

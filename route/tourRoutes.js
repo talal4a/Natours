@@ -6,9 +6,7 @@ const authController = require('../controller/authController');
 const reviewRouter = require('./reviewRoute');
 
 router.use('/:tourId/reviews', reviewRouter);
-router
-  .route('/top-5-cheap')
-  .get(tourController.aliasToptours, tourController.getAllTours);
+router.route('/top-5-cheap').get(tourController.aliasToptours, tourController.getAllTours);
 router.route('/tour-stats').get(tourController.getTourStats);
 router
   .route('/monthly-plan/:year')
@@ -17,9 +15,7 @@ router
     authController.restrictTo('admin', 'lead-guide', 'guide'),
     tourController.getMonthlyPlan
   );
-router
-  .route('/tours-within/:distance/center/:latlng/:unit')
-  .get(tourController.getToursWithin);
+router.route('/tours-within/:distance/center/:latlng/:unit').get(tourController.getToursWithin);
 router.route('/distances/:latlng/:unit').get(tourController.getDistances);
 router
   .route('/')

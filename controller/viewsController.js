@@ -4,12 +4,37 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
 exports.getOverView = catchAsync(async (req, res, next) => {
-  const tours = await Tour.find();
-  res.status(200).render('overview', {
-    title: 'All Tours',
-    user: res.locals.user,
-    tours,
-  });
+  try {
+    // 1) Get tour data from collection
+    const tours = await Tour.find();
+
+    // 2) Build template
+    // 3) Render that template using tour data from 1)
+    res.status(200).render('overview', {
+      title: 'All Tours',
+      tours,
+      user: res.locals.user || null,
+    });
+  } catch (err) {
+    console.error('Error in getOverView:', err);
+
+    // Fallback response if template rendering fails
+    res.status(200).send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Natours | All Tours</title>
+          <link rel="stylesheet" href="/css/style.css">
+        </head>
+        <body>
+          <h1>Welcome to Natours</h1>
+          <p>You are logged in as: ${res.locals.user ? res.locals.user.name : 'Guest'}</p>
+          <p>There was an issue loading tours. Please try again later.</p>
+          <a href="/">Return to Home</a>
+        </body>
+      </html>
+    `);
+  }
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {

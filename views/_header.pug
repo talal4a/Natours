@@ -7,13 +7,17 @@ header.header
 
   nav.nav.nav--user
     if user
-      a.nav__el.nav__el--logout Log out
+      a.nav__el.nav__el--logout(href='#') Log out
       a.nav__el(href='/me')
-        img.nav__user-img(
-          src=user.photo ? `/img/users/${user.photo}` : '/img/users/default.jpg',
-          alt=`Photo of ${user.name}`
-        )
+        if user.photo
+          img.nav__user-img(src=`/img/users/${user.photo}`, alt=`Photo of ${user.name}`)
+        else
+          //- Default avatar if no photo is available
+          img.nav__user-img(src='/img/users/default.jpg', alt='User photo')
         span= user.name.split(' ')[0]
     else
       a.nav__el(href='/login') Log in
       a.nav__el.nav__el--cta(href='/signup') Sign up
+
+//- Include the logout script only when user is logged in
+

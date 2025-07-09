@@ -2,10 +2,8 @@
 const showAlert = (type, msg) => {
   const el = document.querySelector('.alert');
   if (el) el.remove();
-
   const markup = `<div class="alert alert--${type}">${msg}</div>`;
   document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-
   setTimeout(() => {
     const alert = document.querySelector('.alert');
     if (alert) alert.remove();
@@ -36,21 +34,32 @@ const logout = async () => {
   try {
     const res = await axios({
       method: 'GET',
-      url: 'http://127.0.0.1:8000/api/v1/users/logout',
+      url: 'http://localhost:8000/logout',
       withCredentials: true,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
     });
 
     if (res.data.status === 'success') {
-      window.location.reload(true);
+      // Clear any client-side storage
+      localStorage.removeItem('user');
+      // Show success message
+      showAlert('success', 'Logged out successfully!');
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        window.location.assign('/login');
+      }, 1000);
     }
   } catch (err) {
-    showAlert('error', 'Error logging out! Try again.');
+    console.error('Logout error:', err);
+    showAlert('error', 'Error logging out! ' + (err.response?.data?.message || 'Please try again.'));
   }
 };
 
 // ✅ EVENT LISTENERS
 const loginForm = document.querySelector('.form--login');
-const logoutBtn = document.querySelector('.nav__el--logout');
 
 if (loginForm) {
   loginForm.addEventListener('submit', (e) => {
@@ -61,10 +70,11 @@ if (loginForm) {
   });
 }
 
+const logoutBtn = document.querySelector('.nav__el--logout');
+
 if (logoutBtn) {
   logoutBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    console.log('Logout button clicked');
     logout();
   });
 }
